@@ -93,10 +93,10 @@ class DataDownloader:
             query = text(f""" 
             SELECT * 
             FROM staging1_download_DailyData
-            WHERE ASSET='{self.ASSET}' AND INTERVAL='{interval}'
+            WHERE ASSET=:symbol AND INTERVAL=:interval_value
             """)
 
-            df = pd.read_sql(query, con)
+            df = pd.read_sql_query(query, con, params={'symbol': self.ASSET, 'interval_value': interval})
             print(df.shape)
 
         logging.info("Data download executed")
