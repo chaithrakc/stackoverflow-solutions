@@ -1,11 +1,13 @@
+import logging
+import os
+from datetime import datetime
+
 import pandas as pd
 import yfinance as yf
-import logging
-from datetime import datetime, timedelta
-from sqlalchemy import create_engine, Table, MetaData
+from sqlalchemy import create_engine, text
 
 
-class DataDownload:
+class DataDownloader:
 
     def __init__(self, ASSET='TSLA'):
         self.ASSET = ASSET
@@ -87,13 +89,14 @@ class DataDownload:
 
         else:
             engine = create_engine(f'sqlite:///{databasePathName}', echo=True)
-            query = f""" 
+            con = engine.connect()
+            query = text(f""" 
             SELECT * 
             FROM staging1_download_DailyData
-            WHERE ASSET={self.ASSET} AND INTERVAL={interval}
-            """
+            WHERE ASSET='{self.ASSET}' AND INTERVAL='{interval}'
+            """)
 
-            df = pd.read_sql(query, engine)
+            df = pd.read_sql(query, con)
             print(df.shape)
 
         logging.info("Data download executed")
